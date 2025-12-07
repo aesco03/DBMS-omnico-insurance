@@ -1,0 +1,31 @@
+<h2>Your Policies</h2>
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Start</th>
+        <th>End</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (policies && policies.length) { %>
+        <% policies.forEach(p => { %>
+          <tr>
+            <td><%= p.policy_id %></td>
+            <td><%= p.type_name %></td>
+            <td><span class="badge bg-secondary"><%= p.status_name %></span></td>
+            <td><%= p.start_date %></td>
+            <td><%= p.end_date %></td>
+            <td><a href="/policies/<%= p.policy_id %>" class="btn btn-sm btn-primary">View</a></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="6" class="text-muted">No policies found.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+  </div>

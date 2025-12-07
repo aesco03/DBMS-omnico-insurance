@@ -1,0 +1,8 @@
+<% if (typeof flash !== 'undefined' && flash && flash.length) { %>
+  <div class="container mt-3">
+    <% flash.forEach(f => { %>
+      <div class="alert alert-<%= f.type || 'info' %>"><%= f.message %></div>
+    <% }) %>
+  </div>
+<% } %>
+

@@ -1,0 +1,21 @@
+<h2>Users</h2>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Tier</th></tr></thead>
+    <tbody>
+      <% if (users && users.length) { %>
+        <% users.forEach(u => { %>
+          <tr>
+            <td><%= u.user_id %></td>
+            <td><%= u.full_name %></td>
+            <td><%= u.email %></td>
+            <td><%= u.role %></td>
+            <td><%= u.tier_name || '-' %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="5" class="text-muted">No users found.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

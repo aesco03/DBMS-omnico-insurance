@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">OmniCoInsurance</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <% if (currentUser) { %>
+          <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+          <% if (currentUser.role === 'admin') { %>
+            <li class="nav-item"><a class="nav-link" href="/admin/users">Admin</a></li>
+          <% } %>
+        <% } %>
+      </ul>
+      <ul class="navbar-nav">
+        <% if (currentUser) { %>
+          <li class="nav-item"><span class="navbar-text me-3">Hello, <%= currentUser.full_name %></span></li>
+          <li class="nav-item">
+            <form action="/auth/logout" method="post" class="d-inline">
+              <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
+            </form>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+

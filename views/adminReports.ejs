@@ -1,0 +1,22 @@
+<h2>Monthly Revenue</h2>
+<form class="row g-3 mb-3" method="get">
+  <div class="col-auto">
+    <label class="form-label">Year</label>
+    <input type="number" class="form-control" name="year" value="<%= report.year %>">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Month</label>
+    <input type="number" class="form-control" name="month" value="<%= report.month %>">
+  </div>
+  <div class="col-auto align-self-end">
+    <button class="btn btn-primary" type="submit">Run</button>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <p>Total Revenue: <strong>$<%= report.total_revenue.toFixed(2) %></strong></p>
+        <p>Payments Count: <strong><%= report.payments_count %></strong></p>
+      </div>
+    </div>
+  </div>
+</form>

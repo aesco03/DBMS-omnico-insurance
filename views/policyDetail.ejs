@@ -1,0 +1,74 @@
+<h2>Policy <%= policy.policy_id %> – <%= policy.type_name %></h2>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header">Policy Info</div>
+      <div class="card-body">
+        <p>Status: <span class="badge bg-secondary"><%= policy.status_name %></span></p>
+        <p>Start: <%= policy.start_date %></p>
+        <p>End: <%= policy.end_date %></p>
+        <p>Base Premium: $<%= Number(policy.base_premium).toFixed(2) %></p>
+        <% if (policy.details) { %>
+          <hr>
+          <h6>Details</h6>
+          <pre class="mb-0"><%= JSON.stringify(policy.details, null, 2) %></pre>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Claims</span>
+        <a href="/claims/new/<%= policy.policy_id %>" class="btn btn-sm btn-outline-primary">File Claim</a>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+            <% if (claims && claims.length) { %>
+              <% claims.forEach(c => { %>
+                <tr>
+                  <td><%= c.claim_date %></td>
+                  <td>$<%= Number(c.claim_amount).toFixed(2) %></td>
+                  <td><%= c.claim_status %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="3" class="text-muted">No claims.</td></tr>
+            <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Payments</span>
+        <a href="/payments/<%= policy.policy_id %>" class="btn btn-sm btn-outline-secondary">View Payments</a>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+            <% if (payments && payments.length) { %>
+              <% payments.forEach(p => { %>
+                <tr>
+                  <td><%= p.payment_date %></td>
+                  <td>$<%= Number(p.amount).toFixed(2) %></td>
+                  <td><%= p.status %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="3" class="text-muted">No payments.</td></tr>
+            <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
