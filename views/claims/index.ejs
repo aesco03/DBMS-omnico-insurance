@@ -1,0 +1,32 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">My Claims</h2>
+  <a href="/claims/new" class="btn btn-outline-primary">File Claim</a>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Claim ID</th>
+        <th>Policy ID</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (claims && claims.length) { %>
+        <% claims.forEach(c => { %>
+          <tr>
+            <td><%= c.claim_id %></td>
+            <td><a href="/policies/<%= c.policy_id %>"><%= c.policy_id %></a></td>
+            <td><%= c.claim_date %></td>
+            <td>$<%= Number(c.claim_amount).toFixed(2) %></td>
+            <td><%= c.claim_status %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="5" class="text-muted">No claims found.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

@@ -1,5 +1,6 @@
 const { body, validationResult } = require('express-validator');
 const paymentService = require('../services/paymentService');
+const paymentRepo = require('../repositories/paymentRepository');
 
 function paymentValidators() {
   return [
@@ -27,5 +28,19 @@ async function postPayment(req, res) {
   res.redirect(`/payments/${policyId}`);
 }
 
-module.exports = { paymentValidators, getPaymentHistory, postPayment };
+async function getPaymentsIndex(req, res) {
+  const userId = req.session.user.user_id;
+  const payments = await paymentRepo.getPaymentsByUser(userId);
+  res.render('payments/index', { title: 'Payments & Billing', payments });
+}
+
+// Render a selection page where the user picks a policy to make a payment for
+async function getMakePaymentSelection(req, res) {
+  const userId = req.session.user.user_id;
+  const policies = await require('../repositories/policyRepository').getUserPolicies(userId);
+  res.render('payments/select', { title: 'Make a Payment', policies });
+}
+
+module.exports = { paymentValidators, getPaymentHistory, postPayment, getPaymentsIndex, getMakePaymentSelection };
+
 

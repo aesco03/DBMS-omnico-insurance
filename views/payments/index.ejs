@@ -1,0 +1,29 @@
+<h2>Payments & Billing</h2>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Payment ID</th>
+        <th>Policy ID</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (payments && payments.length) { %>
+        <% payments.forEach(p => { %>
+          <tr>
+            <td><%= p.payment_id %></td>
+            <td><a href="/policies/<%= p.policy_id %>"><%= p.policy_id %></a></td>
+            <td><%= p.payment_date %></td>
+            <td>$<%= Number(p.amount).toFixed(2) %></td>
+            <td><%= p.status %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="5" class="text-muted">No payments found.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
