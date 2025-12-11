@@ -9,7 +9,7 @@
     <div class="card mb-3">
       <div class="card-header">Policy Info</div>
       <div class="card-body">
-        <p><strong>Status:</strong> <span class="badge bg-secondary"><%= policy.status_name %></span></p>
+        <p><strong>Status:</strong> <span class="badge <%= policy.status_name === 'Active' ? 'bg-success' : 'bg-secondary' %>"><%= policy.status_name %></span></p>
         <p><strong>Start Date:</strong> <%= policy.start_date %></p>
         <p><strong>End Date:</strong> <%= policy.end_date %></p>
         <p><strong>Base Premium:</strong> <span class="text-success">${<%= Number(policy.base_premium).toFixed(2) %></span></p>

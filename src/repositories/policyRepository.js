@@ -49,6 +49,22 @@ async function createPolicy({ user_id, type_id, start_date, end_date, base_premi
   return result.insertId;
 }
 
+async function createAutoDetail({ policy_id, vehicle_make, vehicle_model, vehicle_year, vehicle_vin, coverage_type, premium_amount }) {
+  await pool.query(
+    `INSERT INTO auto_policy_detail (policy_id, vehicle_make, model, year, vin, coverage_type, premium_amount)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [policy_id, vehicle_make || null, vehicle_model || null, vehicle_year || null, vehicle_vin || null, coverage_type || null, premium_amount || null]
+  );
+}
+
+async function createHomeDetail({ policy_id, property_address, property_value, coverage_limit, deductible }) {
+  await pool.query(
+    `INSERT INTO home_policy_detail (policy_id, property_address, property_value, coverage_limit, deductible)
+     VALUES (?, ?, ?, ?, ?)`,
+    [policy_id, property_address || null, property_value || null, coverage_limit || null, deductible || null]
+  );
+}
+
 async function updatePolicy(policy_id, payload) {
   const fields = [];
   const values = [];
@@ -76,6 +92,8 @@ module.exports = {
   getPolicyById,
   getPolicyWithDetails,
   createPolicy,
+  createAutoDetail,
+  createHomeDetail,
   updatePolicy,
   logPolicyHistory
 };
