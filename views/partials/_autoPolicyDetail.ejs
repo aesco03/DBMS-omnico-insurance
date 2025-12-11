@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">Auto Policy Details</h6>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Make:</dt>
+          <dd class="col-sm-7"><strong><%= details.vehicle_make || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Model:</dt>
+          <dd class="col-sm-7"><strong><%= details.model || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Year:</dt>
+          <dd class="col-sm-7"><strong><%= details.year || 'N/A' %></strong></dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">VIN:</dt>
+          <dd class="col-sm-7"><code><%= details.vin || 'N/A' %></code></dd>
+          
+          <dt class="col-sm-5">Coverage:</dt>
+          <dd class="col-sm-7"><strong><%= details.coverage_type || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Premium:</dt>
+          <dd class="col-sm-7"><strong class="text-success">$<%= Number(details.premium_amount || 0).toFixed(2) %></strong></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
