@@ -1,0 +1,19 @@
+<h2>File a Claim</h2>
+<p class="text-muted">Select which policy you want to file a claim for.</p>
+<div class="list-group">
+  <% if (policies && policies.length) { %>
+    <% policies.forEach(p => { %>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Policy <%= p.policy_id %></strong> — <%= p.type_name %>
+          <div class="text-muted">Status: <%= p.status_name %> • Start: <%= p.start_date %></div>
+        </div>
+        <div>
+          <a href="/claims/new/<%= p.policy_id %>" class="btn btn-outline-primary btn-sm">File Claim</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="list-group-item text-muted">You have no policies to file a claim for.</div>
+  <% } %>
+</div>

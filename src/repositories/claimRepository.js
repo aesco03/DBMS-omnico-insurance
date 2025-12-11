@@ -24,5 +24,18 @@ async function logClaimHistory({ claim_id, policy_id, user_id, claim_status }) {
   );
 }
 
-module.exports = { getClaimsByPolicyUser, insertClaim, logClaimHistory };
+async function getClaimsByUser(user_id) {
+  const [rows] = await pool.query(
+    `SELECT c.*, p.type_id, p.user_id as policy_owner
+     FROM claims c
+     JOIN policy_info p ON c.policy_id = p.policy_id
+     WHERE c.user_id = ?
+     ORDER BY c.claim_date DESC`,
+    [user_id]
+  );
+  return rows;
+}
+
+module.exports = { getClaimsByPolicyUser, insertClaim, logClaimHistory, getClaimsByUser };
+
 

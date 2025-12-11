@@ -24,6 +24,18 @@ async function logPaymentHistory({ payment_id, policy_id, user_id, amount, statu
   );
 }
 
+async function getPaymentsByUser(user_id) {
+  const [rows] = await pool.query(
+    `SELECT pi.*, p.type_id
+     FROM payment_info pi
+     JOIN policy_info p ON pi.policy_id = p.policy_id
+     WHERE pi.user_id = ?
+     ORDER BY pi.payment_date DESC`,
+    [user_id]
+  );
+  return rows;
+}
+
 async function aggregateMonthlyRevenue({ year, month }) {
   const [rows] = await pool.query(
     `SELECT SUM(amount) as total_revenue, COUNT(*) as payments_count
@@ -34,5 +46,5 @@ async function aggregateMonthlyRevenue({ year, month }) {
   return rows[0] || { total_revenue: 0, payments_count: 0 };
 }
 
-module.exports = { getPaymentsByPolicyUser, insertPayment, logPaymentHistory, aggregateMonthlyRevenue };
+module.exports = { getPaymentsByPolicyUser, insertPayment, logPaymentHistory, aggregateMonthlyRevenue, getPaymentsByUser };
 

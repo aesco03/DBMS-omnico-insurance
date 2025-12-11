@@ -1,20 +1,29 @@
+<div class="mb-3">
+  <a href="/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+</div>
+
 <h2>Policy <%= policy.policy_id %> – <%= policy.type_name %></h2>
+
 <div class="row">
   <div class="col-md-6">
     <div class="card mb-3">
       <div class="card-header">Policy Info</div>
       <div class="card-body">
-        <p>Status: <span class="badge bg-secondary"><%= policy.status_name %></span></p>
-        <p>Start: <%= policy.start_date %></p>
-        <p>End: <%= policy.end_date %></p>
-        <p>Base Premium: $<%= Number(policy.base_premium).toFixed(2) %></p>
-        <% if (policy.details) { %>
-          <hr>
-          <h6>Details</h6>
-          <pre class="mb-0"><%= JSON.stringify(policy.details, null, 2) %></pre>
-        <% } %>
+        <p><strong>Status:</strong> <span class="badge bg-secondary"><%= policy.status_name %></span></p>
+        <p><strong>Start Date:</strong> <%= policy.start_date %></p>
+        <p><strong>End Date:</strong> <%= policy.end_date %></p>
+        <p><strong>Base Premium:</strong> <span class="text-success">${<%= Number(policy.base_premium).toFixed(2) %></span></p>
+        <p class="text-muted small">Created: <%= new Date(policy.created_at).toLocaleDateString() %></p>
       </div>
     </div>
+
+    <% if (policy.details) { %>
+      <% if (policy.type_name === 'Auto') { %>
+        <%- include('partials/_autoPolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Home') { %>
+        <%- include('partials/_homePolicyDetail', { details: policy.details }) %>
+      <% } %>
+    <% } %>
   </div>
   <div class="col-md-6">
     <div class="card mb-3">

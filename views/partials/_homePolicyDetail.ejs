@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">Home Policy Details</h6>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Address:</dt>
+          <dd class="col-sm-7"><strong><%= details.property_address || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Property Value:</dt>
+          <dd class="col-sm-7"><strong class="text-info">$<%= Number(details.property_value || 0).toFixed(2) %></strong></dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Coverage Limit:</dt>
+          <dd class="col-sm-7"><strong class="text-info">$<%= Number(details.coverage_limit || 0).toFixed(2) %></strong></dd>
+          
+          <dt class="col-sm-5">Deductible:</dt>
+          <dd class="col-sm-7"><strong class="text-warning">$<%= Number(details.deductible || 0).toFixed(2) %></strong></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

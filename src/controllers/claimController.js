@@ -1,6 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const claimService = require('../services/claimService');
 const policyRepo = require('../repositories/policyRepository');
+const claimRepo = require('../repositories/claimRepository');
 
 function claimValidators() {
   return [
@@ -17,6 +18,13 @@ async function getNewClaim(req, res) {
   res.render('claimForm', { title: 'Submit Claim', policy, errors: [], old: {} });
 }
 
+// Render a selection page where the user picks which policy to file a claim for
+async function getNewClaimSelection(req, res) {
+  const userId = req.session.user.user_id;
+  const policies = await policyRepo.getUserPolicies(userId);
+  res.render('claims/select', { title: 'File a Claim', policies });
+}
+
 async function postClaim(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -28,5 +36,11 @@ async function postClaim(req, res) {
   res.redirect(`/policies/${policy_id}`);
 }
 
-module.exports = { claimValidators, getNewClaim, postClaim };
+async function getClaimsIndex(req, res) {
+  const userId = req.session.user.user_id;
+  const claims = await claimRepo.getClaimsByUser(userId);
+  res.render('claims/index', { title: 'My Claims', claims });
+}
+
+module.exports = { claimValidators, getNewClaim, postClaim, getClaimsIndex, getNewClaimSelection };
 
