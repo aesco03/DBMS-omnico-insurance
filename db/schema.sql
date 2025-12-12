@@ -129,3 +129,12 @@ CREATE INDEX idx_policy_user ON policy_info(user_id);
 CREATE INDEX idx_payment_policy ON payment_info(policy_id);
 CREATE INDEX idx_claims_policy ON claims(policy_id);
 
+CREATE TABLE password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token VARCHAR(255) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES client_info(user_id) ON DELETE CASCADE
+);
+
