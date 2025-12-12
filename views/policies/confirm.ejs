@@ -6,7 +6,10 @@
   <div class="card-body">
     <h5>Coverage</h5>
     <ul>
-      <li><strong>Type:</strong> <%= type_id === 1 ? 'Auto' : (type_id === 2 ? 'Home' : 'Other') %></li>
+      <li><strong>Type:</strong> <% 
+        const typeNames = {1: 'Auto', 2: 'Home', 3: 'Pet', 4: 'Renters', 5: 'Business', 6: 'Health', 7: 'Life'};
+        const typeName = typeNames[type_id] || 'Other';
+      %><%= typeName %></li>
       <li><strong>Start:</strong> <%= start_date %></li>
       <li><strong>End:</strong> <%= end_date %></li>
     </ul>

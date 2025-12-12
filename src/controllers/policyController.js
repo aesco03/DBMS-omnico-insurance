@@ -107,6 +107,10 @@ async function postConfirmPolicy(req, res) {
   // Recompute on server to avoid tampering
   let derived = {};
   const typeNum = Number(type_id);
+  // Validate typeNum immediately before using it
+  if (Number.isNaN(typeNum) || typeNum < 1 || typeNum > 7) {
+    return res.status(400).render('error', { message: 'Invalid policy type', error: {} });
+  }
   const validationErrors = validateQuoteFacts(typeNum, req.body);
   if (validationErrors.length) {
     return res.status(400).render('policies/new', { title: 'Get a Quote', errors: validationErrors, old: req.body });
@@ -130,7 +134,6 @@ async function postConfirmPolicy(req, res) {
 
   // Create base policy with computed premium as base_premium
   const base_premium = derived && typeof derived.premium === 'number' ? derived.premium : Number(derived.premium) || 0;
-  if (Number.isNaN(typeNum)) return res.status(400).render('error', { message: 'Invalid policy type', error: {} });
 
   let policy_id;
   try {
