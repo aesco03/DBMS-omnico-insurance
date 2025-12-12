@@ -49,6 +49,7 @@ app.use('/admin', ensureAuthenticated, ensureRole('admin'), adminRoutes);
 
 app.get('/', (req, res) => {
   if (req.session.user) {
+    if (req.session.user.role === 'admin') return res.redirect('/admin/users');
     return res.redirect('/dashboard');
   }
   res.redirect('/auth/login');

@@ -18,5 +18,10 @@ async function createUser({ full_name, email, phone, address, city, state, passw
   return result.insertId;
 }
 
-module.exports = { findByEmail, findById, createUser };
+async function updatePassword(user_id, password_hash) {
+  const [result] = await pool.query('UPDATE client_info SET password_hash = ? WHERE user_id = ?', [password_hash, user_id]);
+  return result.affectedRows;
+}
+
+module.exports = { findByEmail, findById, createUser, updatePassword };
 

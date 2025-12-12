@@ -22,3 +22,4 @@ Quick start:
    - App runs at `http://localhost:3000` → redirects to login.
 
 Note: Use your own user records in `client_info` (store bcrypt hashes). You can generate a hash with `node scripts/hash.js <password>`.
+node scripts/create_admin.js --email admin@example.com --password YourStrongPass --name "Admin User"
