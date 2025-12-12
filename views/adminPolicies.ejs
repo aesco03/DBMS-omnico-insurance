@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Pending Policies (Quotes)</h2>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Policy ID</th>
+        <th>Type</th>
+        <th>Applicant</th>
+        <th>Start - End</th>
+        <th>Premium</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (policies && policies.length) { %>
+        <% policies.forEach(p => { %>
+          <tr>
+            <td><a href="/policies/<%= p.policy_id %>"><%= p.policy_id %></a></td>
+            <td><%= p.type_name %></td>
+            <td><%= p.full_name %> (<%= p.email %>)</td>
+            <td><%= p.start_date %> - <%= p.end_date %></td>
+            <td>$<%= Number(p.base_premium).toFixed(2) %></td>
+            <td>
+              <form action="/admin/policies/<%= p.policy_id %>" method="POST" style="display:inline-block">
+                <input type="hidden" name="action" value="approve" />
+                <button class="btn btn-sm btn-success">Approve</button>
+              </form>
+              <form action="/admin/policies/<%= p.policy_id %>" method="POST" style="display:inline-block">
+                <input type="hidden" name="action" value="reject" />
+                <button class="btn btn-sm btn-danger">Reject</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr><td colspan="6" class="text-muted">No pending policies.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

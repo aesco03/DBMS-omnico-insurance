@@ -159,6 +159,19 @@ async function logPolicyHistory({ policy_id, user_id, status_id, base_premium })
   );
 }
 
+async function getPendingPolicies() {
+  const [rows] = await pool.query(
+    `SELECT p.*, it.type_name, ps.status_name, u.full_name, u.email
+     FROM policy_info p
+     JOIN insurance_type it ON p.type_id = it.type_id
+     JOIN policy_status ps ON p.status_id = ps.status_id
+     JOIN client_info u ON p.user_id = u.user_id
+     WHERE p.status_id = 2
+     ORDER BY p.created_at DESC`
+  );
+  return rows;
+}
+
 module.exports = {
   getUserPolicies,
   getPolicyById,
@@ -174,5 +187,6 @@ module.exports = {
   ensureInsuranceType,
   updatePolicy,
   logPolicyHistory
+  ,getPendingPolicies
 };
 

@@ -36,6 +36,28 @@ async function getClaimsByUser(user_id) {
   return rows;
 }
 
-module.exports = { getClaimsByPolicyUser, insertClaim, logClaimHistory, getClaimsByUser };
+async function getSubmittedClaims() {
+  const [rows] = await pool.query(
+    `SELECT c.*, p.type_id, p.user_id as policy_owner, u.full_name, u.email
+     FROM claims c
+     JOIN policy_info p ON c.policy_id = p.policy_id
+     JOIN client_info u ON c.user_id = u.user_id
+     WHERE c.claim_status = 'Submitted'
+     ORDER BY c.created_at DESC`
+  );
+  return rows;
+}
+
+async function getClaimById(claim_id) {
+  const [rows] = await pool.query('SELECT * FROM claims WHERE claim_id = ?', [claim_id]);
+  return rows[0] || null;
+}
+
+async function updateClaimStatus(claim_id, claim_status) {
+  const [result] = await pool.query('UPDATE claims SET claim_status = ? WHERE claim_id = ?', [claim_status, claim_id]);
+  return result.affectedRows;
+}
+
+module.exports = { getClaimsByPolicyUser, insertClaim, logClaimHistory, getClaimsByUser, getSubmittedClaims, getClaimById, updateClaimStatus };
 
 

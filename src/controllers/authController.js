@@ -22,14 +22,17 @@ async function getSignup(req, res) {
 async function postLogin(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).render('login', { title: 'Login', errors: errors.array(), old: req.body });
+    return res.status(400).render('login', { title: 'Login', errors: errors.array(), old: req.body, query: req.query });
   }
   const { email, password } = req.body;
   const user = await authService.authenticateUser(email, password);
   if (!user) {
-    return res.status(401).render('login', { title: 'Login', errors: [{ msg: 'Invalid credentials' }], old: { email } });
+    return res.status(401).render('login', { title: 'Login', errors: [{ msg: 'Invalid credentials' }], old: { email }, query: req.query });
   }
   req.session.user = { user_id: user.user_id, full_name: user.full_name, email: user.email, role: user.role };
+  if (user.role === 'admin') {
+    return res.redirect('/admin/users');
+  }
   res.redirect('/dashboard');
 }
 
