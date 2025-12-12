@@ -17,7 +17,7 @@
           <tr>
             <td><%= p.policy_id %></td>
             <td><%= p.type_name %></td>
-            <td><span class="badge bg-secondary"><%= p.status_name %></span></td>
+            <td><span class="badge <%= p.status_name === 'Active' ? 'bg-success' : 'bg-secondary' %>"><%= p.status_name %></span></td>
             <td><%= p.start_date %></td>
             <td><%= p.end_date %></td>
             <td><a href="/policies/<%= p.policy_id %>" class="btn btn-sm btn-primary">View</a></td>
