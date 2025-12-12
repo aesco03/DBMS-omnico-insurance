@@ -67,9 +67,9 @@ async function postNewPolicy(req, res) {
     }
 
     if (typeNum === 1) { // Auto
-      derived = premiumCalc.computeAutoQuote({ vehicle_year: req.body.vehicle_year, coverage_type: req.body.coverage_type });
+      derived = premiumCalc.computeAutoQuote({ vehicle_year: req.body.vehicle_year, coverage_type: req.body.auto_coverage_type });
     } else if (typeNum === 2) { // Home
-      derived = premiumCalc.computeHomeQuote({ property_value: req.body.property_value, deductible: req.body.deductible });
+      derived = premiumCalc.computeHomeQuote({ property_value: req.body.property_value, deductible: req.body.home_deductible });
     } else if (typeNum === 3) {
       derived = premiumCalc.computePetQuote({ age: req.body.pet_age });
     } else if (typeNum === 4) {
@@ -113,9 +113,9 @@ async function postConfirmPolicy(req, res) {
   }
 
   if (typeNum === 1) {
-    derived = premiumCalc.computeAutoQuote({ vehicle_year: req.body.vehicle_year, coverage_type: req.body.coverage_type });
+    derived = premiumCalc.computeAutoQuote({ vehicle_year: req.body.vehicle_year, coverage_type: req.body.auto_coverage_type });
   } else if (typeNum === 2) {
-    derived = premiumCalc.computeHomeQuote({ property_value: req.body.property_value, deductible: req.body.deductible });
+    derived = premiumCalc.computeHomeQuote({ property_value: req.body.property_value, deductible: req.body.home_deductible });
   } else if (typeNum === 3) {
     derived = premiumCalc.computePetQuote({ age: req.body.pet_age });
   } else if (typeNum === 4) {
@@ -155,7 +155,7 @@ async function postConfirmPolicy(req, res) {
         vehicle_model: req.body.vehicle_model,
         vehicle_year: req.body.vehicle_year ? Number(req.body.vehicle_year) : null,
         vehicle_vin: req.body.vehicle_vin,
-        coverage_type: req.body.coverage_type,
+        coverage_type: req.body.auto_coverage_type,
         premium_amount: derived.premium
       });
     } else if (Number(type_id) === 2) {
@@ -164,7 +164,7 @@ async function postConfirmPolicy(req, res) {
         property_address: req.body.property_address,
         property_value: req.body.property_value ? Number(req.body.property_value) : null,
         coverage_limit: derived.coverage_limit,
-        deductible: req.body.deductible ? Number(req.body.deductible) : null
+        deductible: req.body.home_deductible ? Number(req.body.home_deductible) : null
       });
     } else if (Number(type_id) === 3) {
       await policyRepo.createPetDetail({
@@ -183,7 +183,7 @@ async function postConfirmPolicy(req, res) {
         personal_property_value: req.body.personal_property_value ? Number(req.body.personal_property_value) : null,
         term: req.body.renters_term,
         deductible: req.body.renters_deductible ? Number(req.body.renters_deductible) : null,
-        coverage_type: req.body.coverage_type || null,
+        coverage_type: req.body.renters_coverage_type || null,
         coverage_amount: derived.coverage_limit || null,
         premium_amount: derived.premium || null
       });
@@ -198,8 +198,8 @@ async function postConfirmPolicy(req, res) {
         business_address: req.body.business_address || null,
         contact_number: req.body.contact_number || null,
         contact_email: req.body.contact_email || null,
-        deductible: req.body.deductible ? Number(req.body.deductible) : null,
-        coverage_type: req.body.coverage_type || null,
+        deductible: req.body.business_deductible ? Number(req.body.business_deductible) : null,
+        coverage_type: req.body.business_coverage_type || null,
         coverage_amount: derived.coverage_limit || null,
         premium_amount: derived.premium || null
       });

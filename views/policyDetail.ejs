@@ -22,6 +22,16 @@
         <%- include('partials/_autoPolicyDetail', { details: policy.details }) %>
       <% } else if (policy.type_name === 'Home') { %>
         <%- include('partials/_homePolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Pet') { %>
+        <%- include('partials/_petPolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Renters') { %>
+        <%- include('partials/_rentersPolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Business') { %>
+        <%- include('partials/_businessPolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Health') { %>
+        <%- include('partials/_healthPolicyDetail', { details: policy.details }) %>
+      <% } else if (policy.type_name === 'Life') { %>
+        <%- include('partials/_lifePolicyDetail', { details: policy.details }) %>
       <% } %>
     <% } %>
   </div>

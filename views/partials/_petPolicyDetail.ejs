@@ -1,0 +1,34 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">Pet Policy Details</h6>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Pet Name:</dt>
+          <dd class="col-sm-7"><strong><%= details.pet_name || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Species:</dt>
+          <dd class="col-sm-7"><strong><%= details.species || 'N/A' %></strong></dd>
+          
+          <dt class="col-sm-5">Age:</dt>
+          <dd class="col-sm-7"><strong><%= details.age || 'N/A' %></strong></dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Coverage Amount:</dt>
+          <dd class="col-sm-7"><strong class="text-info">$<%= Number(details.coverage_amount || 0).toFixed(2) %></strong></dd>
+          
+          <dt class="col-sm-5">Deductible:</dt>
+          <dd class="col-sm-7"><strong class="text-warning">$<%= Number(details.deductible || 0).toFixed(2) %></strong></dd>
+          
+          <dt class="col-sm-5">Premium:</dt>
+          <dd class="col-sm-7"><strong class="text-success">$<%= Number(details.premium_amount || 0).toFixed(2) %></strong></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
