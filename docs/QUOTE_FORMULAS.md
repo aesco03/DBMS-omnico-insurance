@@ -42,3 +42,30 @@ These are placeholders and should be replaced with official actuarial/business f
 
 - Replace these example formulas with your actuarial-approved logic.
 - Consider adding rate tables, location risk multipliers, and tier-based discounts.
+
+## Additional Temporary Formulas
+
+These formulas were added as placeholders for the new insurance types (Pet, Renters, Business, Health, Life):
+
+- Pet:
+  - Base = $100
+  - If `age > 8` apply 1.2x age factor
+  - `premium = round(base * ageFactor, 2)`
+  - `coverage_limit = round(premium * 20, 2)`
+
+- Renters:
+  - `premium = round(personal_property_value * 0.002, 2)` (0.2% of personal property value)
+  - `coverage_limit = round(personal_property_value, 2)`
+
+- Business:
+  - `premium = round(annual_revenue * 0.001 + 200, 2)` (placeholder: 0.1% of revenue plus base)
+  - `coverage_limit = round(annual_revenue * 0.5, 2)`
+
+- Health:
+  - `premium = round(200 * (1 + max(0, (age - 30) * 0.01)), 2)`
+  - `coverage_limit = round(premium * 50, 2)`
+
+- Life:
+  - `premium = round(150 * (1 + max(0, (age - 40) * 0.02)), 2)`
+  - `coverage_limit = round(premium * 100, 2)`
+

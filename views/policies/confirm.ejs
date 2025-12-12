@@ -27,6 +27,42 @@
         <li>Property value: $<%= facts.property_value || '-' %></li>
         <li>Deductible: $<%= facts.deductible || '-' %></li>
       </ul>
+    <% } else if (type_id === 3) { %>
+      <h6>Pet facts</h6>
+      <ul>
+        <li>Pet name: <%= facts.pet_name || '-' %></li>
+        <li>Species: <%= facts.species || '-' %></li>
+        <li>Age: <%= facts.pet_age || '-' %></li>
+        <li>Deductible: $<%= facts.pet_deductible || '-' %></li>
+      </ul>
+    <% } else if (type_id === 4) { %>
+      <h6>Renters facts</h6>
+      <ul>
+        <li>Rental address: <%= facts.rental_address || '-' %></li>
+        <li>Personal property value: $<%= facts.personal_property_value || '-' %></li>
+        <li>Term: <%= facts.renters_term || '-' %></li>
+      </ul>
+    <% } else if (type_id === 5) { %>
+      <h6>Business facts</h6>
+      <ul>
+        <li>Business name: <%= facts.business_name || '-' %></li>
+        <li>Type: <%= facts.business_type || '-' %></li>
+        <li>Industry: <%= facts.industry || '-' %></li>
+      </ul>
+    <% } else if (type_id === 6) { %>
+      <h6>Health facts</h6>
+      <ul>
+        <li>Provider: <%= facts.provider || '-' %></li>
+        <li>Person name: <%= facts.health_person_name || '-' %></li>
+        <li>Plan: <%= facts.plan || '-' %></li>
+      </ul>
+    <% } else if (type_id === 7) { %>
+      <h6>Life facts</h6>
+      <ul>
+        <li>Beneficiary: <%= facts.beneficiary || '-' %></li>
+        <li>Person name: <%= facts.life_person_name || '-' %></li>
+        <li>Term: <%= facts.life_term || '-' %></li>
+      </ul>
     <% } %>
 
     <h5>Computed Quote</h5>
@@ -51,6 +87,33 @@
         <input type="hidden" name="property_address" value="<%= facts.property_address || '' %>">
         <input type="hidden" name="property_value" value="<%= facts.property_value || '' %>">
         <input type="hidden" name="deductible" value="<%= facts.deductible || '' %>">
+      <% } else if (type_id === 3) { %>
+        <input type="hidden" name="pet_name" value="<%= facts.pet_name || '' %>">
+        <input type="hidden" name="species" value="<%= facts.species || '' %>">
+        <input type="hidden" name="pet_age" value="<%= facts.pet_age || '' %>">
+        <input type="hidden" name="pet_deductible" value="<%= facts.pet_deductible || '' %>">
+        <input type="hidden" name="pet_coverage_amount" value="<%= facts.pet_coverage_amount || '' %>">
+      <% } else if (type_id === 4) { %>
+        <input type="hidden" name="rental_address" value="<%= facts.rental_address || '' %>">
+        <input type="hidden" name="personal_property_value" value="<%= facts.personal_property_value || '' %>">
+        <input type="hidden" name="renters_term" value="<%= facts.renters_term || '' %>">
+        <input type="hidden" name="renters_deductible" value="<%= facts.renters_deductible || '' %>">
+      <% } else if (type_id === 5) { %>
+        <input type="hidden" name="business_name" value="<%= facts.business_name || '' %>">
+        <input type="hidden" name="business_type" value="<%= facts.business_type || '' %>">
+        <input type="hidden" name="industry" value="<%= facts.industry || '' %>">
+        <input type="hidden" name="annual_revenue" value="<%= facts.annual_revenue || '' %>">
+        <input type="hidden" name="number_of_employees" value="<%= facts.number_of_employees || '' %>">
+      <% } else if (type_id === 6) { %>
+        <input type="hidden" name="provider" value="<%= facts.provider || '' %>">
+        <input type="hidden" name="health_person_name" value="<%= facts.health_person_name || '' %>">
+        <input type="hidden" name="plan" value="<%= facts.plan || '' %>">
+        <input type="hidden" name="health_age" value="<%= facts.health_age || '' %>">
+      <% } else if (type_id === 7) { %>
+        <input type="hidden" name="beneficiary" value="<%= facts.beneficiary || '' %>">
+        <input type="hidden" name="life_person_name" value="<%= facts.life_person_name || '' %>">
+        <input type="hidden" name="life_term" value="<%= facts.life_term || '' %>">
+        <input type="hidden" name="life_age" value="<%= facts.life_age || '' %>">
       <% } %>
 
       <button type="submit" class="btn btn-success">Accept Quote</button>

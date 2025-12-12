@@ -1,14 +1,14 @@
 CREATE DATABASE IF NOT EXISTS omnico_insurance;
 USE omnico_insurance;
 
-CREATE TABLE tier (
+CREATE TABLE IF NOT EXISTS tier (
   tier_id INT AUTO_INCREMENT PRIMARY KEY,
   tier_name VARCHAR(50) NOT NULL,
   discount_rate DECIMAL(5,2) NOT NULL,
   benefits_description TEXT
 );
 
-CREATE TABLE client_info (
+CREATE TABLE IF NOT EXISTS client_info (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   full_name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
@@ -22,18 +22,18 @@ CREATE TABLE client_info (
   FOREIGN KEY (tier_id) REFERENCES tier(tier_id)
 );
 
-CREATE TABLE insurance_type (
+CREATE TABLE IF NOT EXISTS insurance_type (
   type_id INT AUTO_INCREMENT PRIMARY KEY,
   type_name VARCHAR(50) NOT NULL,
   description TEXT
 );
 
-CREATE TABLE policy_status (
+CREATE TABLE IF NOT EXISTS policy_status (
   status_id INT AUTO_INCREMENT PRIMARY KEY,
   status_name VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE policy_info (
+CREATE TABLE IF NOT EXISTS policy_info (
   policy_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   type_id INT NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE policy_info (
   FOREIGN KEY (status_id) REFERENCES policy_status(status_id)
 );
 
-CREATE TABLE payment_info (
+CREATE TABLE IF NOT EXISTS payment_info (
   payment_id INT AUTO_INCREMENT PRIMARY KEY,
   policy_id INT NOT NULL,
   user_id INT NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE payment_info (
   FOREIGN KEY (user_id) REFERENCES client_info(user_id)
 );
 
-CREATE TABLE claims (
+CREATE TABLE IF NOT EXISTS claims (
   claim_id INT AUTO_INCREMENT PRIMARY KEY,
   policy_id INT NOT NULL,
   user_id INT NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE claims (
   FOREIGN KEY (user_id) REFERENCES client_info(user_id)
 );
 
-CREATE TABLE auto_policy_detail (
+CREATE TABLE IF NOT EXISTS auto_policy_detail (
   policy_id INT PRIMARY KEY,
   vehicle_make VARCHAR(50),
   model VARCHAR(50),
@@ -85,7 +85,7 @@ CREATE TABLE auto_policy_detail (
   FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
 );
 
-CREATE TABLE home_policy_detail (
+CREATE TABLE IF NOT EXISTS home_policy_detail (
   policy_id INT PRIMARY KEY,
   property_address VARCHAR(255),
   property_value DECIMAL(12,2),
@@ -94,7 +94,72 @@ CREATE TABLE home_policy_detail (
   FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
 );
 
-CREATE TABLE policy_history (
+-- Additional policy detail tables for other insurance types
+CREATE TABLE IF NOT EXISTS pet_policy_detail (
+  policy_id INT PRIMARY KEY,
+  pet_name VARCHAR(100),
+  species VARCHAR(50),
+  age INT,
+  deductible DECIMAL(10,2),
+  coverage_amount DECIMAL(12,2),
+  premium_amount DECIMAL(10,2),
+  FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
+);
+
+CREATE TABLE IF NOT EXISTS renters_policy_detail (
+  policy_id INT PRIMARY KEY,
+  rental_address VARCHAR(255),
+  personal_property_value DECIMAL(12,2),
+  term VARCHAR(50),
+  deductible DECIMAL(10,2),
+  coverage_type VARCHAR(50),
+  coverage_amount DECIMAL(12,2),
+  premium_amount DECIMAL(10,2),
+  FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
+);
+
+CREATE TABLE IF NOT EXISTS business_policy_detail (
+  policy_id INT PRIMARY KEY,
+  business_name VARCHAR(150),
+  business_type VARCHAR(100),
+  industry VARCHAR(100),
+  annual_revenue DECIMAL(15,2),
+  number_of_employees INT,
+  business_address VARCHAR(255),
+  contact_number VARCHAR(30),
+  contact_email VARCHAR(100),
+  deductible DECIMAL(12,2),
+  coverage_type VARCHAR(50),
+  coverage_amount DECIMAL(15,2),
+  premium_amount DECIMAL(12,2),
+  FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
+);
+
+CREATE TABLE IF NOT EXISTS health_policy_detail (
+  policy_id INT PRIMARY KEY,
+  provider VARCHAR(150),
+  person_name VARCHAR(150),
+  plan VARCHAR(100),
+  age INT,
+  deductible DECIMAL(10,2),
+  coverage_amount DECIMAL(12,2),
+  premium_amount DECIMAL(12,2),
+  FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
+);
+
+CREATE TABLE IF NOT EXISTS life_policy_detail (
+  policy_id INT PRIMARY KEY,
+  beneficiary VARCHAR(150),
+  person_name VARCHAR(150),
+  term VARCHAR(50),
+  age INT,
+  deductible DECIMAL(10,2),
+  coverage_amount DECIMAL(15,2),
+  premium_amount DECIMAL(12,2),
+  FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id)
+);
+
+CREATE TABLE IF NOT EXISTS policy_history (
   history_id INT AUTO_INCREMENT PRIMARY KEY,
   policy_id INT NOT NULL,
   user_id INT NOT NULL,
@@ -106,7 +171,7 @@ CREATE TABLE policy_history (
   FOREIGN KEY (status_id) REFERENCES policy_status(status_id)
 );
 
-CREATE TABLE payment_history (
+CREATE TABLE IF NOT EXISTS payment_history (
   history_id INT AUTO_INCREMENT PRIMARY KEY,
   payment_id INT NOT NULL,
   policy_id INT NOT NULL,
@@ -116,7 +181,7 @@ CREATE TABLE payment_history (
   changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE claim_history (
+CREATE TABLE IF NOT EXISTS claim_history (
   history_id INT AUTO_INCREMENT PRIMARY KEY,
   claim_id INT NOT NULL,
   policy_id INT NOT NULL,
@@ -125,7 +190,22 @@ CREATE TABLE claim_history (
   changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_policy_user ON policy_info(user_id);
-CREATE INDEX idx_payment_policy ON payment_info(policy_id);
-CREATE INDEX idx_claims_policy ON claims(policy_id);
+-- Create indexes if they do not exist (idempotent)
+DELIMITER $$
+DROP PROCEDURE IF EXISTS ensure_indexes$$
+CREATE PROCEDURE ensure_indexes()
+BEGIN
+  IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'policy_info' AND index_name = 'idx_policy_user') = 0 THEN
+    ALTER TABLE policy_info ADD INDEX idx_policy_user (user_id);
+  END IF;
+  IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'payment_info' AND index_name = 'idx_payment_policy') = 0 THEN
+    ALTER TABLE payment_info ADD INDEX idx_payment_policy (policy_id);
+  END IF;
+  IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'claims' AND index_name = 'idx_claims_policy') = 0 THEN
+    ALTER TABLE claims ADD INDEX idx_claims_policy (policy_id);
+  END IF;
+END$$
+CALL ensure_indexes()$$
+DROP PROCEDURE IF EXISTS ensure_indexes$$
+DELIMITER ;
 

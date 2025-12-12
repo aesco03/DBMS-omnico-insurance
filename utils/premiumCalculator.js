@@ -48,4 +48,60 @@ function computeHomeQuote(facts = {}) {
   return { premium, coverage_limit };
 }
 
-module.exports = { computeAutoQuote, computeHomeQuote };
+function computePetQuote(facts = {}) {
+  // facts: { age }
+  const base = 100;
+  const age = Number(facts.age) || 0;
+  const ageFactor = age > 8 ? 1.2 : 1;
+  const premium = round(base * ageFactor);
+  const coverage_limit = round(premium * 20);
+  return { premium, coverage_limit };
+}
+
+function computeRentersQuote(facts = {}) {
+  // facts: { personal_property_value }
+  const value = Number(facts.personal_property_value) || 0;
+  const rate = 0.002; // 0.2%
+  const premium = round(value * rate);
+  const coverage_limit = round(value);
+  return { premium, coverage_limit };
+}
+
+function computeBusinessQuote(facts = {}) {
+  // facts: { annual_revenue }
+  const revenue = Number(facts.annual_revenue) || 0;
+  const rate = 0.001; // 0.1% of revenue as placeholder
+  const premium = round(revenue * rate + 200); // base + revenue factor
+  const coverage_limit = round(revenue * 0.5);
+  return { premium, coverage_limit };
+}
+
+function computeHealthQuote(facts = {}) {
+  // facts: { age }
+  const age = Number(facts.age) || 0;
+  const base = 200;
+  const ageFactor = 1 + Math.max(0, (age - 30) * 0.01);
+  const premium = round(base * ageFactor);
+  const coverage_limit = round(premium * 50);
+  return { premium, coverage_limit };
+}
+
+function computeLifeQuote(facts = {}) {
+  // facts: { age }
+  const age = Number(facts.age) || 0;
+  const base = 150;
+  const ageFactor = 1 + Math.max(0, (age - 40) * 0.02);
+  const premium = round(base * ageFactor);
+  const coverage_limit = round(premium * 100);
+  return { premium, coverage_limit };
+}
+
+module.exports = {
+  computeAutoQuote,
+  computeHomeQuote,
+  computePetQuote,
+  computeRentersQuote,
+  computeBusinessQuote,
+  computeHealthQuote,
+  computeLifeQuote
+};

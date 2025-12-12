@@ -9,7 +9,12 @@ VALUES
 INSERT INTO insurance_type (type_name, description)
 VALUES
 ('Auto', 'Automobile insurance'),
-('Home', 'Homeowners insurance');
+('Home', 'Homeowners insurance'),
+('Pet', 'Pet insurance'),
+('Renters', 'Renters insurance'),
+('Business', 'Business insurance'),
+('Health', 'Health insurance'),
+('Life', 'Life insurance');
 
 INSERT INTO policy_status (status_name)
 VALUES
