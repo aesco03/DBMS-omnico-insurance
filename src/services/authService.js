@@ -3,6 +3,7 @@ const clientRepo = require('../repositories/clientRepository');
 const resetRepo = require('../repositories/resetRepository');
 const crypto = require('crypto');
 const emailService = require('./emailService');
+const pool = require('../../config/db');
 
 
 async function authenticateUser(email, password) {
@@ -40,7 +41,7 @@ async function resetPassword(token, newPassword) {
     throw new Error('Token expired');
   }
   const password_hash = await bcrypt.hash(newPassword, 10);
-  await require('../../config/db').query('UPDATE client_info SET password_hash = ? WHERE user_id = ?', [password_hash, reset.user_id]);
+  await pool.query('UPDATE client_info SET password_hash = ? WHERE user_id = ?', [password_hash, reset.user_id]);
   await resetRepo.deleteById(reset.id);
 }
 
