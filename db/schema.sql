@@ -53,9 +53,11 @@ CREATE TABLE IF NOT EXISTS payment_info (
   policy_id INT NOT NULL,
   user_id INT NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
-  payment_date DATE NOT NULL,
+  payment_date DATE,
+  due_date DATE NOT NULL,
   method VARCHAR(30),
-  status VARCHAR(30),
+  payment_option VARCHAR(30) DEFAULT 'Monthly',
+  status VARCHAR(30) DEFAULT 'Pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (policy_id) REFERENCES policy_info(policy_id),
   FOREIGN KEY (user_id) REFERENCES client_info(user_id)
@@ -200,6 +202,12 @@ BEGIN
   END IF;
   IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'payment_info' AND index_name = 'idx_payment_policy') = 0 THEN
     ALTER TABLE payment_info ADD INDEX idx_payment_policy (policy_id);
+  END IF;
+  IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'payment_info' AND index_name = 'idx_payment_due_date') = 0 THEN
+    ALTER TABLE payment_info ADD INDEX idx_payment_due_date (due_date);
+  END IF;
+  IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'payment_info' AND index_name = 'idx_payment_status_due') = 0 THEN
+    ALTER TABLE payment_info ADD INDEX idx_payment_status_due (status, due_date);
   END IF;
   IF (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = DATABASE() AND table_name = 'claims' AND index_name = 'idx_claims_policy') = 0 THEN
     ALTER TABLE claims ADD INDEX idx_claims_policy (policy_id);

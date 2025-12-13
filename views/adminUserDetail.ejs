@@ -1,0 +1,201 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">User Details: <%= user.full_name %></h2>
+  <a href="/admin/users" class="btn btn-outline-secondary">Back to Users</a>
+</div>
+
+<!-- User Information Card -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">User Information</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">User ID:</dt>
+          <dd class="col-sm-8"><%= user.user_id %></dd>
+          
+          <dt class="col-sm-4">Full Name:</dt>
+          <dd class="col-sm-8"><strong><%= user.full_name %></strong></dd>
+          
+          <dt class="col-sm-4">Email:</dt>
+          <dd class="col-sm-8"><%= user.email %></dd>
+          
+          <dt class="col-sm-4">Phone:</dt>
+          <dd class="col-sm-8"><%= user.phone || '-' %></dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Role:</dt>
+          <dd class="col-sm-8">
+            <span class="badge <%= user.role === 'admin' ? 'bg-danger' : user.role === 'agent' ? 'bg-info' : 'bg-secondary' %>">
+              <%= user.role %>
+            </span>
+          </dd>
+          
+          <dt class="col-sm-4">Tier:</dt>
+          <dd class="col-sm-8"><%= tier ? tier.tier_name : '-' %></dd>
+          
+          <dt class="col-sm-4">Address:</dt>
+          <dd class="col-sm-8"><%= user.address || '-' %></dd>
+          
+          <dt class="col-sm-4">City, State:</dt>
+          <dd class="col-sm-8"><%= [user.city, user.state].filter(Boolean).join(', ') || '-' %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs for History -->
+<ul class="nav nav-tabs mb-3" id="historyTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies" type="button" role="tab">
+      Policies (<%= policies ? policies.length : 0 %>)
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">
+      Payments (<%= payments ? payments.length : 0 %>)
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="claims-tab" data-bs-toggle="tab" data-bs-target="#claims" type="button" role="tab">
+      Claims (<%= claims ? claims.length : 0 %>)
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="historyTabContent">
+  <!-- Policies Tab -->
+  <div class="tab-pane fade show active" id="policies" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Policy ID</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Premium</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (policies && policies.length) { %>
+            <% policies.forEach(p => { %>
+              <tr>
+                <td><%= p.policy_id %></td>
+                <td><%= p.type_name %></td>
+                <td>
+                  <span class="badge <%= p.status_name === 'Active' ? 'bg-success' : p.status_name === 'Pending' ? 'bg-warning' : 'bg-secondary' %>">
+                    <%= p.status_name %>
+                  </span>
+                </td>
+                <td><%= p.start_date %></td>
+                <td><%= p.end_date %></td>
+                <td>$<%= Number(p.base_premium).toFixed(2) %></td>
+                <td>
+                  <a href="/policies/<%= p.policy_id %>" class="btn btn-sm btn-outline-primary">View</a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-muted">No policies found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Payments Tab -->
+  <div class="tab-pane fade" id="payments" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Policy ID</th>
+            <th>Due Date</th>
+            <th>Paid Date</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (payments && payments.length) { %>
+            <% payments.forEach(p => { %>
+              <% 
+                const isOverdue = p.status === 'Overdue';
+                const isPending = p.status === 'Pending';
+                const isCompleted = p.status === 'Completed';
+                const isPartiallyPaid = p.status === 'Partially Paid';
+              %>
+              <tr class="<%= isOverdue ? 'table-danger' : isPending ? 'table-warning' : isPartiallyPaid ? 'table-info' : '' %>">
+                <td><%= p.payment_id %></td>
+                <td><a href="/policies/<%= p.policy_id %>"><%= p.policy_id %></a></td>
+                <td><%= p.due_date || '-' %></td>
+                <td><%= p.payment_date || '-' %></td>
+                <td>$<%= Number(p.amount).toFixed(2) %></td>
+                <td><%= p.method || '-' %></td>
+                <td>
+                  <span class="badge <%= isCompleted ? 'bg-success' : isOverdue ? 'bg-danger' : isPartiallyPaid ? 'bg-info' : isPending ? 'bg-warning' : 'bg-secondary' %>">
+                    <%= p.status || 'Pending' %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-muted">No payments found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Claims Tab -->
+  <div class="tab-pane fade" id="claims" role="tabpanel">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Claim ID</th>
+            <th>Policy ID</th>
+            <th>Claim Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (claims && claims.length) { %>
+            <% claims.forEach(c => { %>
+              <tr>
+                <td><%= c.claim_id %></td>
+                <td><a href="/policies/<%= c.policy_id %>"><%= c.policy_id %></a></td>
+                <td><%= c.claim_date %></td>
+                <td>$<%= Number(c.claim_amount).toFixed(2) %></td>
+                <td>
+                  <span class="badge <%= c.claim_status === 'Approved' ? 'bg-success' : c.claim_status === 'Rejected' ? 'bg-danger' : 'bg-warning' %>">
+                    <%= c.claim_status %>
+                  </span>
+                </td>
+                <td><%= c.description ? (c.description.length > 50 ? c.description.substring(0, 50) + '...' : c.description) : '-' %></td>
+                <td>
+                  <a href="/policies/<%= c.policy_id %>" class="btn btn-sm btn-outline-primary">View Policy</a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-muted">No claims found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

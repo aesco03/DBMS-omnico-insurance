@@ -1,11 +1,61 @@
-<h2>Payments & Billing</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Payments & Billing</h2>
+  <div class="btn-group" role="group">
+    <% 
+      // Helper to build URL with query parameters
+      function buildUrl(viewParam, overdueParam) {
+        const params = [];
+        if (viewParam === 'all') params.push('view=all');
+        else if (viewParam === null && showAll) params.push('view=all');
+        if (overdueParam === true) params.push('hide_overdue=true');
+        else if (overdueParam === false && hideOverdue) params.push('hide_overdue=true');
+        return '/payments' + (params.length ? '?' + params.join('&') : '');
+      }
+    %>
+    <% if (showAll) { %>
+      <a href="/payments<%= hideOverdue ? '' : '?hide_overdue=false' %>" class="btn btn-outline-secondary btn-sm">
+        Show Current Only
+      </a>
+    <% } else { %>
+      <a href="/payments?view=all<%= hideOverdue ? '' : '&hide_overdue=false' %>" class="btn btn-outline-primary btn-sm">
+        View All
+      </a>
+    <% } %>
+    <% if (hideOverdue) { %>
+      <a href="/payments<%= showAll ? '?view=all&hide_overdue=false' : '?hide_overdue=false' %>" class="btn btn-danger btn-sm">
+        Show Overdue
+      </a>
+    <% } else { %>
+      <a href="/payments<%= showAll ? '?view=all' : '' %>" class="btn btn-outline-danger btn-sm">
+        Hide Overdue
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<% if (!showAll) { %>
+  <div class="alert alert-info mb-3">
+    <% if (hideOverdue) { %>
+      Showing upcoming payments and recent payments (last 30 days). Overdue payments are hidden.
+    <% } else { %>
+      Showing upcoming payments, recent payments (last 30 days), and overdue payments. 
+    <% } %>
+    <a href="/payments?view=all<%= hideOverdue ? '' : '&hide_overdue=false' %>" class="alert-link">View full payment schedule</a>
+  </div>
+<% } else if (hideOverdue) { %>
+  <div class="alert alert-warning mb-3">
+    Overdue payments are hidden. <a href="/payments?view=all&hide_overdue=false" class="alert-link">Show overdue payments</a>
+  </div>
+<% } %>
+
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Payment ID</th>
         <th>Policy ID</th>
-        <th>Date</th>
+        <th>Due Date</th>
+        <th>Paid Date</th>
         <th>Amount</th>
         <th>Status</th>
       </tr>
@@ -13,16 +63,26 @@
     <tbody>
       <% if (payments && payments.length) { %>
         <% payments.forEach(p => { %>
-          <tr>
+          <% 
+            const isOverdue = p.status === 'Overdue';
+            const isPending = p.status === 'Pending';
+            const isCompleted = p.status === 'Completed';
+          %>
+          <tr class="<%= isOverdue ? 'table-danger' : isPending ? 'table-warning' : '' %>">
             <td><%= p.payment_id %></td>
             <td><a href="/policies/<%= p.policy_id %>"><%= p.policy_id %></a></td>
-            <td><%= p.payment_date %></td>
+            <td><%= p.due_date || '-' %></td>
+            <td><%= p.payment_date || '-' %></td>
             <td>$<%= Number(p.amount).toFixed(2) %></td>
-            <td><%= p.status %></td>
+            <td>
+              <span class="badge <%= isCompleted ? 'bg-success' : isOverdue ? 'bg-danger' : isPending ? 'bg-warning' : 'bg-secondary' %>">
+                <%= p.status || 'Pending' %>
+              </span>
+            </td>
           </tr>
         <% }) %>
       <% } else { %>
-        <tr><td colspan="5" class="text-muted">No payments found.</td></tr>
+        <tr><td colspan="6" class="text-muted">No payments found.</td></tr>
       <% } %>
     </tbody>
   </table>
