@@ -21,5 +21,10 @@ Quick start:
 4) Access:
    - App runs at `http://localhost:3000` → redirects to login.
 
+5) Create an admin account (for testing admin features):
+   ```bash
+   node scripts/create_admin.js --email admin@example.com --password YourStrongPass --name "Admin User"
+   ```
+   Replace `admin@example.com`, `YourStrongPass`, and `Admin User` with your desired email, password, and name.
+
 Note: Use your own user records in `client_info` (store bcrypt hashes). You can generate a hash with `node scripts/hash.js <password>`.
-node scripts/create_admin.js --email admin@example.com --password YourStrongPass --name "Admin User"

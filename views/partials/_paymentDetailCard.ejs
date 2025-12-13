@@ -1,0 +1,75 @@
+<% 
+  // Determine status classes and colors
+  const isOverdue = payment.status === 'Overdue';
+  const isPending = payment.status === 'Pending';
+  const isCompleted = payment.status === 'Completed';
+  const isPartiallyPaid = payment.status === 'Partially Paid';
+  const isPayable = !isCompleted && (isPending || isOverdue || isPartiallyPaid);
+  
+  // Card border color based on status
+  let cardBorderClass = '';
+  if (isOverdue) cardBorderClass = 'border-danger';
+  else if (isPending) cardBorderClass = 'border-warning';
+  else if (isPartiallyPaid) cardBorderClass = 'border-info';
+  else if (isCompleted) cardBorderClass = 'border-success';
+  
+  // Badge color
+  let badgeClass = 'bg-secondary';
+  if (isCompleted) badgeClass = 'bg-success';
+  else if (isOverdue) badgeClass = 'bg-danger';
+  else if (isPartiallyPaid) badgeClass = 'bg-info';
+  else if (isPending) badgeClass = 'bg-warning';
+  
+  // Toggle dot state
+  const isSelected = typeof selectedPaymentId !== 'undefined' && selectedPaymentId == payment.payment_id;
+%>
+
+<div class="card mb-3 <%= cardBorderClass %> <%= isSelected ? 'shadow border-primary' : '' %>" 
+     <%= isPayable ? 'onclick="selectPayment(' + payment.payment_id + ', ' + payment.amount + ', \'' + (payment.due_date || '') + '\', \'' + (payment.status || 'Pending') + '\')" style="cursor: pointer; transition: all 0.2s;"' : '' %>
+     id="payment-card-<%= payment.payment_id %>"
+     onmouseover="<%= isPayable ? 'this.style.transform=\'scale(1.02)\'; this.style.boxShadow=\'0 4px 8px rgba(0,0,0,0.1)\';' : '' %>"
+     onmouseout="<%= isPayable ? 'if(!document.getElementById(\'payment-radio-' + payment.payment_id + '\').checked) { this.style.transform=\'scale(1)\'; this.style.boxShadow=\'\'; }' : '' %>">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center mb-2">
+          <% if (isPayable) { %>
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="payment_selection" 
+                     id="payment-radio-<%= payment.payment_id %>"
+                     value="<%= payment.payment_id %>"
+                     <%= isSelected ? 'checked' : '' %>
+                     style="width: 1.2rem; height: 1.2rem; cursor: pointer;"
+                     onchange="selectPayment(<%= payment.payment_id %>, <%= payment.amount %>, '<%= payment.due_date || '' %>', '<%= payment.status || 'Pending' %>')">
+              <label class="form-check-label" for="payment-radio-<%= payment.payment_id %>" style="cursor: pointer;"></label>
+            </div>
+          <% } %>
+          <h6 class="card-title mb-0">
+            Payment #<%= payment.payment_id %>
+            <span class="badge <%= badgeClass %> ms-2"><%= payment.status || 'Pending' %></span>
+          </h6>
+        </div>
+        
+        <div class="row g-2">
+          <div class="col-6">
+            <small class="text-muted">Due Date:</small>
+            <div><strong><%= payment.due_date || '-' %></strong></div>
+          </div>
+          <div class="col-6">
+            <small class="text-muted">Paid Date:</small>
+            <div><strong><%= payment.payment_date || '-' %></strong></div>
+          </div>
+          <div class="col-6">
+            <small class="text-muted">Amount:</small>
+            <div><strong class="text-primary">$<%= Number(payment.amount).toFixed(2) %></strong></div>
+          </div>
+          <div class="col-6">
+            <small class="text-muted">Method:</small>
+            <div><strong><%= payment.method || '-' %></strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,25 +1,42 @@
-<h2>Payments – Policy <%= policy.policy_id %></h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Payments – Policy <%= policy.policy_id %></h2>
+  <div>
+    <% if (showAll) { %>
+      <a href="/payments/<%= policy.policy_id %>" class="btn btn-outline-secondary btn-sm">
+        Show Upcoming Only
+      </a>
+    <% } else { %>
+      <a href="/payments/<%= policy.policy_id %>?view=all" class="btn btn-outline-primary btn-sm">
+        View Full Schedule
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<% if (!showAll) { %>
+  <div class="alert alert-info mb-3">
+    Showing payments that can be made (pending, overdue, and partially paid). Click on a payment row to select it.
+    <a href="/payments/<%= policy.policy_id %>?view=all" class="alert-link">View full payment schedule</a>
+  </div>
+<% } %>
+
 <div class="row">
   <div class="col-md-7">
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
-        <tbody>
-          <% if (payments && payments.length) { %>
-            <% payments.forEach(p => { %>
-              <tr>
-                <td><%= p.payment_date %></td>
-                <td>$<%= Number(p.amount).toFixed(2) %></td>
-                <td><%= p.method || '-' %></td>
-                <td><%= p.status || '-' %></td>
-              </tr>
-            <% }) %>
-          <% } else { %>
-            <tr><td colspan="4" class="text-muted">No payments yet.</td></tr>
-          <% } %>
-        </tbody>
-      </table>
-    </div>
+    <h5 class="mb-3">Payment Schedule</h5>
+    <% if (payments && payments.length) { %>
+      <div id="payments-list">
+        <% payments.forEach(p => { %>
+          <%- include('partials/_paymentDetailCard', { 
+            payment: p, 
+            selectedPaymentId: old.payment_id 
+          }) %>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="alert alert-info">
+        <p class="mb-0">No payments yet.</p>
+      </div>
+    <% } %>
   </div>
   <div class="col-md-5">
     <div class="card">
@@ -32,25 +49,151 @@
             </ul>
           </div>
         <% } %>
-        <form action="/payments/<%= policy.policy_id %>" method="post">
+        <form action="/payments/<%= policy.policy_id %>" method="post" id="paymentForm">
+          <input type="hidden" name="payment_id" id="selected_payment_id" value="<%= old.payment_id || '' %>">
+          
           <div class="mb-3">
-            <label class="form-label">Date</label>
+            <label class="form-label">Select Payment</label>
+            <select class="form-select" name="payment_id" id="payment_select" onchange="updatePaymentForm()" required>
+              <option value="">-- Select a payment to pay --</option>
+              <% if (payments && payments.length) { %>
+                <% payments.forEach(p => { %>
+                  <% if (p.status !== 'Completed') { %>
+                    <option value="<%= p.payment_id %>" 
+                            data-amount="<%= p.amount %>" 
+                            data-due-date="<%= p.due_date %>"
+                            data-status="<%= p.status %>"
+                            <%= old.payment_id == p.payment_id ? 'selected' : '' %>>
+                      <%= p.due_date || 'No due date' %> - $<%= Number(p.amount).toFixed(2) %> 
+                      (<%= p.status || 'Pending' %>)
+                    </option>
+                  <% } %>
+                <% }) %>
+              <% } %>
+            </select>
+            <small class="form-text text-muted">Select which payment you want to make</small>
+          </div>
+          
+          <div id="payment_details" class="mb-3" style="display: none;">
+            <div class="card bg-light">
+              <div class="card-body">
+                <strong>Payment Details:</strong><br>
+                <span id="payment_due_date"></span><br>
+                <span id="payment_status"></span><br>
+                <strong>Amount Due: <span id="payment_amount_due"></span></strong>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Payment Date</label>
             <input type="date" name="payment_date" class="form-control" value="<%= old.payment_date || '' %>" required>
           </div>
           <div class="mb-3">
-            <label class="form-label">Amount</label>
-            <input type="number" step="0.01" name="amount" class="form-control" value="<%= old.amount || '' %>" required>
+            <label class="form-label">Payment Amount <small class="text-muted">(can be partial)</small></label>
+            <input type="number" step="0.01" name="amount" id="payment_amount" class="form-control" 
+                   value="<%= old.amount || '' %>" 
+                   min="0.01" required>
+            <small class="form-text text-muted">Enter the amount you're paying. You can pay less than the full amount.</small>
           </div>
           <div class="mb-3">
-            <label class="form-label">Method</label>
+            <label class="form-label">Payment Method</label>
             <select class="form-select" name="method">
               <option value="Card">Card</option>
               <option value="Bank">Bank</option>
               <option value="Cash">Cash</option>
             </select>
           </div>
-          <button class="btn btn-primary" type="submit">Save</button>
+          <button class="btn btn-primary" type="submit" id="submit_btn" disabled>Record Payment</button>
         </form>
+        
+        <script>
+          function updatePaymentForm() {
+            const select = document.getElementById('payment_select');
+            const paymentId = select.value;
+            const selectedOption = select.options[select.selectedIndex];
+            const detailsDiv = document.getElementById('payment_details');
+            const submitBtn = document.getElementById('submit_btn');
+            const amountInput = document.getElementById('payment_amount');
+            const hiddenInput = document.getElementById('selected_payment_id');
+            
+            if (paymentId) {
+              const amount = parseFloat(selectedOption.getAttribute('data-amount'));
+              const dueDate = selectedOption.getAttribute('data-due-date');
+              const status = selectedOption.getAttribute('data-status');
+              
+              // Update hidden input
+              hiddenInput.value = paymentId;
+              
+              // Show payment details
+              document.getElementById('payment_due_date').textContent = 'Due Date: ' + (dueDate || 'N/A');
+              document.getElementById('payment_status').textContent = 'Status: ' + status;
+              document.getElementById('payment_amount_due').textContent = '$' + amount.toFixed(2);
+              detailsDiv.style.display = 'block';
+              
+              // Set default amount to full amount
+              amountInput.value = amount.toFixed(2);
+              amountInput.max = amount;
+              
+              // Enable submit button
+              submitBtn.disabled = false;
+              
+              // Highlight selected card
+              document.querySelectorAll('[id^="payment-card-"]').forEach(card => {
+                card.classList.remove('shadow', 'border-primary');
+              });
+              const card = document.getElementById('payment-card-' + paymentId);
+              if (card) {
+                card.classList.add('shadow', 'border-primary');
+              }
+              
+              // Update radio button
+              document.querySelectorAll('input[name="payment_selection"]').forEach(radio => {
+                radio.checked = (radio.value == paymentId);
+              });
+            } else {
+              detailsDiv.style.display = 'none';
+              submitBtn.disabled = true;
+              amountInput.value = '';
+              document.querySelectorAll('[id^="payment-card-"]').forEach(card => {
+                card.classList.remove('shadow', 'border-primary');
+              });
+              document.querySelectorAll('input[name="payment_selection"]').forEach(radio => {
+                radio.checked = false;
+              });
+            }
+          }
+          
+          function selectPayment(paymentId, amount, dueDate, status) {
+            const select = document.getElementById('payment_select');
+            if (select) {
+              select.value = paymentId;
+            }
+            
+            // Update radio buttons
+            document.querySelectorAll('input[name="payment_selection"]').forEach(radio => {
+              radio.checked = (radio.value == paymentId);
+            });
+            
+            // Update card highlights
+            document.querySelectorAll('[id^="payment-card-"]').forEach(card => {
+              card.classList.remove('shadow', 'border-primary');
+            });
+            const card = document.getElementById('payment-card-' + paymentId);
+            if (card) {
+              card.classList.add('shadow', 'border-primary');
+            }
+            
+            updatePaymentForm();
+          }
+          
+          // Initialize form if payment_id is in old data
+          <% if (old.payment_id) { %>
+            document.addEventListener('DOMContentLoaded', function() {
+              updatePaymentForm();
+            });
+          <% } %>
+        </script>
       </div>
     </div>
   </div>
