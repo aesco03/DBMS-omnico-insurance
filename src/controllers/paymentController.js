@@ -4,7 +4,9 @@ const paymentRepo = require('../repositories/paymentRepository');
 
 function paymentValidators() {
   return [
-    body('payment_id').notEmpty().withMessage('Please select a payment to pay'),
+    // payment_id is optional - if provided, we're updating an existing payment
+    // if not provided, we're creating a new payment record
+    body('payment_id').optional().notEmpty().withMessage('If selecting a payment, it must not be empty'),
     body('amount').isFloat({ gt: 0 }).withMessage('Valid amount required'),
     body('payment_date').isISO8601().withMessage('Valid date required')
   ];
@@ -22,11 +24,42 @@ async function postPayment(req, res) {
   const { policyId } = req.params;
   const showAll = req.query.view === 'all';
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const data = await paymentService.getPaymentHistory(Number(policyId), req.session.user, showAll);
-    return res.status(400).render('paymentHistory', { title: 'Payment History', ...data, showAll, errors: errors.array(), old: req.body });
-  }
+  
   const { amount, payment_date, due_date, method, payment_id } = req.body;
+  
+  // Additional validation: if payment_id is provided, validate it exists
+  // If not provided, ensure we have all required fields for creating a new payment
+  const customErrors = [];
+  
+  if (payment_id) {
+    // Validate that the payment exists and belongs to this policy
+    const [paymentRows] = await require('../../config/db').query(
+      'SELECT * FROM payment_info WHERE payment_id = ? AND policy_id = ?',
+      [payment_id, policyId]
+    );
+    if (paymentRows.length === 0) {
+      customErrors.push({
+        msg: 'Selected payment not found or does not belong to this policy',
+        param: 'payment_id'
+      });
+    }
+  } else {
+    // For new payments, due_date is required if not provided
+    if (!due_date && !payment_date) {
+      customErrors.push({
+        msg: 'Due date is required when creating a new payment',
+        param: 'due_date'
+      });
+    }
+  }
+  
+  // Combine validation errors with custom errors
+  const allErrors = errors.array().concat(customErrors);
+  
+  if (!errors.isEmpty() || customErrors.length > 0) {
+    const data = await paymentService.getPaymentHistory(Number(policyId), req.session.user, showAll);
+    return res.status(400).render('paymentHistory', { title: 'Payment History', ...data, showAll, errors: allErrors, old: req.body });
+  }
   
   // If payment_id is provided, this is updating an existing pending payment
   if (payment_id) {
